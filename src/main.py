@@ -61,7 +61,7 @@ def evaluate_test(model, graph, labels, test_idx, evaluator):
 
 def train(args):
     # load dataset
-    graph, labels, train_idx, val_idx, test_idx, evaluator = utils.load_dataset(args.dataset)
+    graph, labels, train_idx, val_idx, test_idx, evaluator = utils.load_dataset(args.dataset, root=args.data_root)
     if args.preprocess:
         graph = preprocess(graph, args.use_label)
     labels = labels.to(dev)
@@ -144,6 +144,7 @@ def train(args):
 
     # tensorboard monitor
     model_name = "gipa_{}_{}".format(args.dataset, cur_time)
+    os.makedirs("./log", exist_ok=True)
     LOG_PATH = "./log/{}".format(model_name)
     if not os.path.exists(LOG_PATH):
         os.mkdir(LOG_PATH)
@@ -153,6 +154,7 @@ def train(args):
     dur = []
     best_val_score = 0.0
     final_test_score = 0.0
+    os.makedirs("./saved_models", exist_ok=True)
     for epoch in range(args.n_epochs):
         model.train()
         t0 = time.time()
@@ -208,6 +210,8 @@ if __name__ == '__main__':
     parser.add_argument("--gpu", type=int, default=0, help="gpu")
     parser.add_argument("--dataset", type=str, default='proteins',
                         help="dataset: cora, citeseer, pubmed, amazon, reddit, proteins")
+    parser.add_argument("--data-root", type=str, default='./datasets',
+                        help="dataset download dir")
     parser.add_argument("--seed", type=int, default=0, help="random seed")
 
     parser.add_argument("--lr", type=float, default=1e-2, help="learning rate")
@@ -258,6 +262,7 @@ if __name__ == '__main__':
     # saving configuration
     cur_time = time.strftime("%Y_%m_%d_%H_%M_%S", time.localtime())
     argsDict = args.__dict__
+    os.makedirs("./config", exist_ok=True)
     with open("./config/config_gipa_{}_{}.txt".format(args.dataset, cur_time), 'w') as f:
         for arg, value in argsDict.items():
             f.writelines("{}: {}\n".format(arg, value))
