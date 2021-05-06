@@ -1,0 +1,1 @@
+python src/main.py --n-layers 6 --n-epochs 8000 --lr 0.01 --batch-size 8000 --use-label --if-save --preprocess --n-hop 1 --gpu 0 --eval-every 5 --seed 0
